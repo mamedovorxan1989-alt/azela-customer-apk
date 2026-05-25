@@ -10,8 +10,8 @@ android {
         applicationId "com.azela.customer"
         minSdk 21
         targetSdk 34
-        versionCode 201
-        versionName "2.0.1"
+        versionCode 206
+        versionName "2.0.6"
     }
 
     buildTypes {

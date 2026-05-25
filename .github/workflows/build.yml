@@ -34,16 +34,16 @@ jobs:
 
       - name: Delete existing release if exists
         run: |
-          gh release delete v2.0.1 --yes 2>/dev/null || true
-          git push --delete origin v2.0.1 2>/dev/null || true
+          gh release delete v2.0.6 --yes 2>/dev/null || true
+          git push --delete origin v2.0.6 2>/dev/null || true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release with APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.1
-          name: AZELA Müştəri APK v2.0.1
+          tag_name: v2.0.6
+          name: AZELA Müştəri APK v2.0.6
           body: "AZELA Pro Müştəri tətbiqi — Android üçün"
           files: AZELA-Customer.apk
           make_latest: true
