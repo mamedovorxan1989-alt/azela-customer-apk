@@ -2,11 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: write
+    branches: [main]
 
 jobs:
   build:
@@ -21,31 +17,28 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Gradle wrapper
-        run: |
-          gradle wrapper --gradle-version=8.6 --distribution-type=bin
-          chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.3'
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      - name: Build Release APK
+        run: gradle assembleRelease
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Rename APK
-        run: cp app/build/outputs/apk/debug/app-debug.apk AZELA-Customer.apk
-
-      - name: Delete existing release if exists
         run: |
-          gh release delete v2.0.6 --yes 2>/dev/null || true
-          git push --delete origin v2.0.6 2>/dev/null || true
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION=$(grep versionName app/build.gradle | grep -o '".*"' | tr -d '"')
+          cp app/build/outputs/apk/release/app-release.apk AZELA-Customer-v${VERSION}.apk
+          echo "APK_FILE=AZELA-Customer-v${VERSION}.apk" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Create Release with APK
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v2.0.6
-          name: AZELA Müştəri APK v2.0.6
-          body: "AZELA Pro Müştəri tətbiqi — Android üçün"
-          files: AZELA-Customer.apk
-          make_latest: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ env.VERSION }}
+          name: AZELA Customer v${{ env.VERSION }}
+          files: ${{ env.APK_FILE }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: "Yeni ikon - AZELA logo"
